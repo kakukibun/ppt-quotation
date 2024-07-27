@@ -73,29 +73,39 @@
         <div class="form-group">
             <label for="urgency">交付时间:</label>
             <select id="urgency">
-                <option value="normal">正常 (24 小时)</option>
-                <option value="urgent">紧急 (12 小时)</option>
+                <option value="normal">正常 (12 小时以上)</option>
+                <option value="urgent">紧急 (12 小时内)</option>
             </select>
         </div>
         <div class="form-group">
             <label for="design">设计级别:</label>
             <select id="design">
-                <option value="standard">标准</option>
-                <option value="premium">精美</option>
+                <option value="basic">基础设计</option>
+                <option value="standard">标准设计</option>
+                <option value="premium">精美设计</option>
+                <option value="chief">首席设计</option>
             </select>
         </div>
         <div class="form-group">
-            <label for="content">播放模式:</label>
+            <label for="content">页面:</label>
             <select id="content">
                 <option value="static">静态</option>
                 <option value="dynamic">动态</option>
             </select>
         </div>
         <div class="form-group">
-            <label for="layout">要求:</label>
+            <label for="layout">内容要求:</label>
             <select id="layout">
                 <option value="contentOnly">仅排版</option>
                 <option value="designAndContent">内容加排版</option>
+            </select>
+        </div>
+      <div class="form-group">
+            <label for="ziLiao">是否提供资料:</label>
+            <select id="ziLiao">
+                <option value="tiGong">是</option>
+                <option value="noTiGong">否</option>
+              <option value="yiBuFen">提供部分资料</option>
             </select>
         </div>
         <button onclick="calculatePrice()">计算</button>
@@ -109,15 +119,27 @@
             const design = document.getElementById('design').value;
             const content = document.getElementById('content').value;
             const layout = document.getElementById('layout').value;
+            const ziLiao = document.getElementById('ziLiao').value;
 
-            let price = pages * 10; // Base price per page
+            let price = pages * 5; // Base price per page
 
             if (urgency === 'urgent') {
-                price += pages * 1; // Additional charge for urgency
+                price += pages * 2; // Additional charge for urgency
             }
 
-            if (design === 'premium') {
-                price += pages * 15; // Additional charge for premium design
+            switch (design) {
+                case 'basic':
+                    price += pages * 0; // Additional charge for basic design
+                    break;
+                case 'standard':
+                    price += pages * 5; // Additional charge for standard design
+                    break;
+                case 'premium':
+                    price += pages * 20; // Additional charge for premium design
+                    break;
+                case 'chief':
+                    price += pages * 30; // Additional charge for chief design
+                    break;
             }
 
             if (content === 'dynamic') {
@@ -127,7 +149,18 @@
             if (layout === 'designAndContent') {
                 price += pages * 10; // Additional charge for design and content
             }
-
+			switch (ziLiao) {
+                case 'tiGong':
+                    price += pages * 0; // Additional charge for basic design
+                    break;
+                case 'noTiGong':
+                    price += pages * 5; // Additional charge for standard design
+                    break;
+                case 'yiBuFen':
+                    price += pages * 2; // Additional charge for premium design
+                    break;
+                
+            }
             document.getElementById('quote').innerText = `Total Price: ¥${price.toFixed(2)}`;
         }
     </script>
