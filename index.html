@@ -61,6 +61,9 @@
                 padding: 8px;
             }
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -100,19 +103,40 @@
                 <option value="designAndContent">内容加排版</option>
             </select>
         </div>
-      <div class="form-group">
+        <div class="form-group">
             <label for="ziLiao">是否提供资料:</label>
             <select id="ziLiao">
                 <option value="tiGong">是</option>
                 <option value="noTiGong">否</option>
-              <option value="yiBuFen">提供部分资料</option>
+                <option value="yiBuFen">提供部分资料</option>
             </select>
         </div>
+        <div class="form-group">
+            <label for="tables">是否要制作数据表:</label>
+            <select id="tables" onchange="toggleTableInput()">
+                <option value="no">否</option>
+                <option value="yes">是</option>
+            </select>
+        </div>
+        <div class="form-group hidden" id="table-count-group">
+            <label for="table-count">数据表数量:</label>
+            <input type="number" id="table-count" min="0">
+        </div>
         <button onclick="calculatePrice()">计算</button>
-        <h3 id="quote">Total Price: ¥0.00</h3>
+        <h3 id="quote">总价: ¥0.00</h3>
     </div>
 
     <script>
+        function toggleTableInput() {
+            const tableSelect = document.getElementById('tables');
+            const tableCountGroup = document.getElementById('table-count-group');
+            if (tableSelect.value === 'yes') {
+                tableCountGroup.classList.remove('hidden');
+            } else {
+                tableCountGroup.classList.add('hidden');
+            }
+        }
+
         function calculatePrice() {
             const pages = document.getElementById('pages').value;
             const urgency = document.getElementById('urgency').value;
@@ -120,11 +144,13 @@
             const content = document.getElementById('content').value;
             const layout = document.getElementById('layout').value;
             const ziLiao = document.getElementById('ziLiao').value;
+            const tables = document.getElementById('tables').value;
+            const tableCount = document.getElementById('table-count').value || 0;
 
-            let price = pages * 5; // Base price per page
+            let price = pages * 4; // Base price per page
 
             if (urgency === 'urgent') {
-                price += pages * 2; // Additional charge for urgency
+                price += pages * 1; // Additional charge for urgency
             }
 
             switch (design) {
@@ -132,10 +158,10 @@
                     price += pages * 0; // Additional charge for basic design
                     break;
                 case 'standard':
-                    price += pages * 5; // Additional charge for standard design
+                    price += pages * 4; // Additional charge for standard design
                     break;
                 case 'premium':
-                    price += pages * 20; // Additional charge for premium design
+                    price += pages * 21; // Additional charge for premium design
                     break;
                 case 'chief':
                     price += pages * 30; // Additional charge for chief design
@@ -143,25 +169,30 @@
             }
 
             if (content === 'dynamic') {
-                price += pages * 10; // Additional charge for dynamic content
+                price += pages * 2; // Additional charge for dynamic content
             }
 
             if (layout === 'designAndContent') {
-                price += pages * 10; // Additional charge for design and content
+                price += pages * 5; // Additional charge for design and content
             }
-			switch (ziLiao) {
+
+            switch (ziLiao) {
                 case 'tiGong':
-                    price += pages * 0; // Additional charge for basic design
+                    price += pages * 0; // No additional charge for providing all materials
                     break;
                 case 'noTiGong':
-                    price += pages * 5; // Additional charge for standard design
+                    price += pages * 5; // Additional charge for not providing materials
                     break;
                 case 'yiBuFen':
-                    price += pages * 2; // Additional charge for premium design
+                    price += pages * 2; // Additional charge for providing partial materials
                     break;
-                
             }
-            document.getElementById('quote').innerText = `Total Price: ¥${price.toFixed(2)}`;
+
+            if (tables === 'yes') {
+                price += tableCount * 5; // Additional charge for each table
+            }
+
+            document.getElementById('quote').innerText = `总价: ¥${price.toFixed(2)}`;
         }
     </script>
 </body>
