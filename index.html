@@ -83,9 +83,11 @@
         <div class="form-group">
             <label for="design">设计级别:</label>
             <select id="design">
-                <option value="basic">基础设计</option>
+                <option value="simple">简单设计</option>
+                <option value="general">一般设计</option>
                 <option value="standard">标准设计</option>
                 <option value="premium">精美设计</option>
+                <option value="highEnd">高端设计</option>
                 <option value="chief">首席设计</option>
             </select>
         </div>
@@ -123,7 +125,7 @@
             <input type="number" id="table-count" min="0">
         </div>
         <button onclick="calculatePrice()">计算</button>
-        <h3 id="quote">总价: ¥0.00</h3>
+        <h3 id="quote">Total Price: ¥0.00</h3>
     </div>
 
     <script>
@@ -147,33 +149,28 @@
             const tables = document.getElementById('tables').value;
             const tableCount = document.getElementById('table-count').value || 0;
 
-            let price = pages * 4; // Base price per page
+            let price = 0; // Initialize price
+
+            if (design === 'simple') {
+                price = content === 'static' ? pages * 5 : pages * 8;
+            } else if (design === 'general') {
+                price = content === 'static' ? pages * 8 : pages * 12;
+            } else if (design === 'standard') {
+                price = content === 'static' ? pages * 12 : pages * 15;
+            } else if (design === 'premium') {
+                price = content === 'static' ? pages * 25 : pages * 30;
+            } else if (design === 'highEnd') {
+                price = content === 'static' ? pages * 40 : pages * 45;
+            } else if (design === 'chief') {
+                price = content === 'static' ? pages * 150 : pages * 200;
+            }
 
             if (urgency === 'urgent') {
                 price += pages * 1; // Additional charge for urgency
             }
 
-            switch (design) {
-                case 'basic':
-                    price += pages * 0; // Additional charge for basic design
-                    break;
-                case 'standard':
-                    price += pages * 4; // Additional charge for standard design
-                    break;
-                case 'premium':
-                    price += pages * 21; // Additional charge for premium design
-                    break;
-                case 'chief':
-                    price += pages * 30; // Additional charge for chief design
-                    break;
-            }
-
-            if (content === 'dynamic') {
-                price += pages * 2; // Additional charge for dynamic content
-            }
-
             if (layout === 'designAndContent') {
-                price += pages * 5; // Additional charge for design and content
+                price += pages * 2; // Additional charge for design and content
             }
 
             switch (ziLiao) {
@@ -181,18 +178,18 @@
                     price += pages * 0; // No additional charge for providing all materials
                     break;
                 case 'noTiGong':
-                    price += pages * 5; // Additional charge for not providing materials
+                    price += pages * 2; // Additional charge for not providing materials
                     break;
                 case 'yiBuFen':
-                    price += pages * 2; // Additional charge for providing partial materials
+                    price += pages * 1; // Additional charge for providing partial materials
                     break;
             }
 
             if (tables === 'yes') {
-                price += tableCount * 5; // Additional charge for each table
+                price += tableCount * 2; // Additional charge for each table
             }
 
-            document.getElementById('quote').innerText = `总价: ¥${price.toFixed(2)}`;
+            document.getElementById('quote').innerText = `Total Price: ¥${price.toFixed(2)}`;
         }
     </script>
 </body>
