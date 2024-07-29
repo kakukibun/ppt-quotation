@@ -87,7 +87,7 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;" onkeydown="return disableKey(event);">
     <div class="container">
         <h2>PPT 报价计算</h2>
         <div class="form-group">
@@ -95,7 +95,7 @@
             <input type="number" id="pages" min="1">
         </div>
         <div class="form-group">
-            <label for="urgency">交付时间:</label>
+            <label for="urgency">交付时间（12小时内为紧急，计算结果会自动加钱）:</label>
             <select id="urgency">
                 <option value="12hours">12小时内</option>
                 <option value="1day">一天内</option>
@@ -105,7 +105,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="design">设计级别:</label>
+            <label for="design">设计级别（客户提供模板建议选一般或简单设计）:</label>
             <select id="design">
                 <option value="simple">简单设计</option>
                 <option value="general">一般设计</option>
@@ -141,16 +141,23 @@
             <label for="table-count">数据表数量:</label>
             <input type="number" id="table-count" min="0">
         </div>
-        <button onclick="calculatePrice()">计算</button>
-        <h3 id="quote">Total Price: ¥0.00</h3>
+        <button onclick="calculatePrice()">计算基础价</button>
+        <h3 id="quote">基础价（未加广告费）: ¥0.00</h3>
         <div class="detail-text">
             <span id="details"> </span>
-            <button onclick="copyDetails()">复制</button>
+            <button onclick="copyDetails()">复制报价结果</button>
         </div>
         <div class="suggestion" id="suggestion">建议报价: ¥0.00 ~ ¥0.00</div>
     </div>
 
     <script>
+        function disableKey(e) {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+                e.preventDefault();
+                return false;
+            }
+        }
+
         function toggleTableInput() {
             const tableSelect = document.getElementById('tables');
             const tableCountGroup = document.getElementById('table-count-group');
@@ -203,14 +210,14 @@
             }
 
             if (tables === 'yes') {
-                price += tableCount * 2; // Additional charge for each table
+                price += tableCount * 3; // Additional charge for each table
             }
 
             const totalPrice = price.toFixed(2);
-            const suggestionMin = ((price + 35) * 0.85).toFixed(2);
-            const suggestionMax = ((price + 35) * 1.1).toFixed(2);
+            const suggestionMin = ((price * 0.8) + 60).toFixed(2);
+            const suggestionMax = ((price * 1.1) + 60).toFixed(2);
 
-            document.getElementById('quote').innerText = `Total Price: ¥${totalPrice}`;
+            document.getElementById('quote').innerText = `基础价: ¥${totalPrice}，（还需加广告费，一般加60）`;
 
             const urgencyText = urgency === '12hours' ? '12小时内' : 
                                 urgency === '1day' ? '一天内' : 
@@ -224,12 +231,12 @@
             const contentText = content === 'static' ? '静态' : '动态';
             const ziLiaoText = ziLiao === 'tiGong' ? '提供资料' : 
                                ziLiao === 'noTiGong' ? '无资料' : '提供部分资料';
-            const tablesText = tables === 'no' ? '无数据表' : `${tableCount}张数据表`;
+            const tablesText = tables === 'no' ? '不用做数据表' : `由设计师做${tableCount}张数据表`;
 
-            const detailsText = `${pages}页，${urgencyText}交付，${designText}，${contentText}页面，${ziLiaoText}，${tablesText}，总价：¥${(parseFloat(totalPrice) +40).toFixed(2)}。`;
+            const detailsText = `${pages}页，${urgencyText}交付，${designText}，${contentText}页面，${ziLiaoText}，${tablesText}，根据以上需求为您报价：¥${(parseFloat(totalPrice) + 60).toFixed(2)}。`;
             document.getElementById('details').innerText = detailsText;
 
-            document.getElementById('suggestion').innerText = `建议报价: ¥${suggestionMin} ~ ¥${suggestionMax}`;
+            document.getElementById('suggestion').innerText = `建议报价: ¥${suggestionMin} ~ ¥${suggestionMax}，尽量在此范围内`;
         }
 
         function copyDetails() {
