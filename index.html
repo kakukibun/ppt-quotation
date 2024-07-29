@@ -50,6 +50,11 @@
             text-align: center;
             color: #007bff;
         }
+        .suggestion {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+        }
         @media (max-width: 600px) {
             body {
                 margin: 10px;
@@ -120,6 +125,7 @@
         </div>
         <button onclick="calculatePrice()">计算</button>
         <h3 id="quote">Total Price: ¥0.00</h3>
+        <div class="suggestion" id="suggestion">建议报价: ¥0.00 ~ ¥0.00</div>
     </div>
 
     <script>
@@ -163,8 +169,6 @@
                 price += pages * 1; // Additional charge for urgency
             }
 
-            
-
             switch (ziLiao) {
                 case 'tiGong':
                     price += pages * 0; // No additional charge for providing all materials
@@ -181,7 +185,12 @@
                 price += tableCount * 2; // Additional charge for each table
             }
 
-            document.getElementById('quote').innerText = `Total Price: ¥${price.toFixed(2)}`;
+            const totalPrice = price.toFixed(2);
+            const suggestionMin = ((price + 40) * 0.85).toFixed(2);
+            const suggestionMax = ((price + 30) * 1.1).toFixed(2);
+
+            document.getElementById('quote').innerText = `Total Price: ¥${totalPrice}`;
+            document.getElementById('suggestion').innerText = `建议报价: ¥${suggestionMin} ~ ¥${suggestionMax}`;
         }
     </script>
 </body>
