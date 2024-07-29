@@ -17,6 +17,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         .form-group {
             margin-bottom: 15px;
@@ -62,6 +63,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
         .detail-text button {
             width: auto;
@@ -70,6 +72,16 @@
         }
         .detail-text button:hover {
             background-color: #0056b3;
+        }
+        .watermark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><text x="50%" y="50%" fill="rgba(255,255,255,0.5)" font-size="20" font-family="Arial" text-anchor="middle" dy=".3em">私密报价</text></svg>') repeat;
+            opacity: 0.5;
         }
         @media (max-width: 600px) {
             body {
@@ -89,6 +101,7 @@
 </head>
 <body oncontextmenu="return false;" onkeydown="return disableKey(event);">
     <div class="container">
+        <div class="watermark"></div>
         <h2>PPT 报价计算</h2>
         <div class="form-group">
             <label for="pages">页数:</label>
@@ -240,7 +253,8 @@
                                ziLiao === 'noTiGong' ? '无资料' : '提供部分资料';
             const tablesText = tables === 'no' ? '不用做数据表' : `由设计师做${tableCount}张数据表`;
 
-            const detailsText = `${pages}页，${urgencyText}交付，${designText}，${contentText}页面，${ziLiaoText}，${tablesText}，根据以上需求为您报价：¥${Math.max(100, (parseFloat(totalPrice) + 60).toFixed(2))}。`;
+            const finalPrice = Math.max(100, (parseFloat(totalPrice) + 60).toFixed(2));
+            const detailsText = `${pages}页，${urgencyText}交付，${designText}，${contentText}页面，${ziLiaoText}，${tablesText}，根据以上需求为您报价：¥${finalPrice}。`;
             document.getElementById('details').innerText = detailsText;
 
             document.getElementById('suggestion').innerText = `建议报价: ¥${suggestionMin} ~ ¥${suggestionMax}，尽量在此范围内`;
