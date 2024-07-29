@@ -55,6 +55,22 @@
             color: red;
             font-weight: bold;
         }
+        .detail-text {
+            text-align: center;
+            color: #333;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .detail-text button {
+            width: auto;
+            margin-left: 10px;
+            background-color: #007bff;
+        }
+        .detail-text button:hover {
+            background-color: #0056b3;
+        }
         @media (max-width: 600px) {
             body {
                 margin: 10px;
@@ -81,8 +97,11 @@
         <div class="form-group">
             <label for="urgency">交付时间:</label>
             <select id="urgency">
-                <option value="normal">正常 (12 小时以上)</option>
-                <option value="urgent">紧急 (12 小时内)</option>
+                <option value="12hours">12小时内</option>
+                <option value="1day">一天内</option>
+                <option value="2days">两天内</option>
+                <option value="3days">三天内</option>
+                <option value="3daysplus">三天以上</option>
             </select>
         </div>
         <div class="form-group">
@@ -103,7 +122,6 @@
                 <option value="dynamic">动态</option>
             </select>
         </div>
-        
         <div class="form-group">
             <label for="ziLiao">是否提供资料:</label>
             <select id="ziLiao">
@@ -125,6 +143,10 @@
         </div>
         <button onclick="calculatePrice()">计算</button>
         <h3 id="quote">Total Price: ¥0.00</h3>
+        <div class="detail-text">
+            <span id="details"> </span>
+            <button onclick="copyDetails()">复制</button>
+        </div>
         <div class="suggestion" id="suggestion">建议报价: ¥0.00 ~ ¥0.00</div>
     </div>
 
@@ -144,7 +166,6 @@
             const urgency = document.getElementById('urgency').value;
             const design = document.getElementById('design').value;
             const content = document.getElementById('content').value;
-            
             const ziLiao = document.getElementById('ziLiao').value;
             const tables = document.getElementById('tables').value;
             const tableCount = document.getElementById('table-count').value || 0;
@@ -165,7 +186,7 @@
                 price = content === 'static' ? pages * 150 : pages * 200;
             }
 
-            if (urgency === 'urgent') {
+            if (urgency === '12hours') {
                 price += pages * 1; // Additional charge for urgency
             }
 
@@ -186,11 +207,38 @@
             }
 
             const totalPrice = price.toFixed(2);
-            const suggestionMin = ((price + 40) * 0.85).toFixed(2);
-            const suggestionMax = ((price + 30) * 1.1).toFixed(2);
+            const suggestionMin = ((price + 35) * 0.85).toFixed(2);
+            const suggestionMax = ((price + 35) * 1.1).toFixed(2);
 
             document.getElementById('quote').innerText = `Total Price: ¥${totalPrice}`;
+
+            const urgencyText = urgency === '12hours' ? '12小时内' : 
+                                urgency === '1day' ? '一天内' : 
+                                urgency === '2days' ? '两天内' : 
+                                urgency === '3days' ? '三天内' : '三天以上';
+            const designText = design === 'simple' ? '简单设计' :
+                               design === 'general' ? '一般设计' :
+                               design === 'standard' ? '标准设计' :
+                               design === 'premium' ? '精美设计' :
+                               design === 'highEnd' ? '高端设计' : '首席设计';
+            const contentText = content === 'static' ? '静态' : '动态';
+            const ziLiaoText = ziLiao === 'tiGong' ? '提供资料' : 
+                               ziLiao === 'noTiGong' ? '无资料' : '提供部分资料';
+            const tablesText = tables === 'no' ? '无数据表' : `${tableCount}张数据表`;
+
+            const detailsText = `${pages}页，${urgencyText}交付，${designText}，${contentText}页面，${ziLiaoText}，${tablesText}，总价：¥${(parseFloat(totalPrice) +40).toFixed(2)}。`;
+            document.getElementById('details').innerText = detailsText;
+
             document.getElementById('suggestion').innerText = `建议报价: ¥${suggestionMin} ~ ¥${suggestionMax}`;
+        }
+
+        function copyDetails() {
+            const detailsText = document.getElementById('details').innerText;
+            navigator.clipboard.writeText(detailsText).then(() => {
+                alert('复制成功!');
+            }).catch(err => {
+                alert('复制失败，请重试');
+            });
         }
     </script>
 </body>
