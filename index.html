@@ -213,9 +213,16 @@
                 price += tableCount * 3; // Additional charge for each table
             }
 
-            const totalPrice = price.toFixed(2);
-            const suggestionMin = ((price * 0.8) + 60).toFixed(2);
-            const suggestionMax = ((price * 1.1) + 60).toFixed(2);
+            const totalPrice = parseFloat(price.toFixed(2));
+            let suggestionMin = ((totalPrice * 0.8) + 60).toFixed(2);
+            let suggestionMax = ((totalPrice * 1.1) + 60).toFixed(2);
+
+            if (suggestionMin < 100) {
+                suggestionMin = 100;
+            }
+            if (suggestionMax < 100) {
+                suggestionMax = 100;
+            }
 
             document.getElementById('quote').innerText = `基础价: ¥${totalPrice}，（还需加广告费，一般加60）`;
 
@@ -233,7 +240,7 @@
                                ziLiao === 'noTiGong' ? '无资料' : '提供部分资料';
             const tablesText = tables === 'no' ? '不用做数据表' : `由设计师做${tableCount}张数据表`;
 
-            const detailsText = `${pages}页，${urgencyText}交付，${designText}，${contentText}页面，${ziLiaoText}，${tablesText}，根据以上需求为您报价：¥${(parseFloat(totalPrice) + 60).toFixed(2)}。`;
+            const detailsText = `${pages}页，${urgencyText}交付，${designText}，${contentText}页面，${ziLiaoText}，${tablesText}，根据以上需求为您报价：¥${Math.max(100, (parseFloat(totalPrice) + 60).toFixed(2))}。`;
             document.getElementById('details').innerText = detailsText;
 
             document.getElementById('suggestion').innerText = `建议报价: ¥${suggestionMin} ~ ¥${suggestionMax}，尽量在此范围内`;
