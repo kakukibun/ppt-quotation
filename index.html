@@ -104,6 +104,13 @@
         <div class="watermark"></div>
         <h2>PPT 报价计算</h2>
         <div class="form-group">
+            <label for="shop-status">店铺当前状态:</label>
+            <select id="shop-status">
+                <option value="normal">正常期</option>
+                <option value="promotion">冲量期</option>
+            </select>
+        </div>
+        <div class="form-group">
             <label for="pages">页数:</label>
             <input type="number" id="pages" min="1">
         </div>
@@ -189,6 +196,7 @@
             const ziLiao = document.getElementById('ziLiao').value;
             const tables = document.getElementById('tables').value;
             const tableCount = document.getElementById('table-count').value || 0;
+            const shopStatus = document.getElementById('shop-status').value;
 
             let price = 0; // Initialize price
 
@@ -223,12 +231,17 @@
             }
 
             if (tables === 'yes') {
-                price += tableCount * 3; // Additional charge for each table
+                price += tableCount * 5; // Additional charge for each table
             }
 
-            const totalPrice = parseFloat(price.toFixed(2));
+            let totalPrice = parseFloat(price.toFixed(2));
+			let suggestionMax = ((totalPrice * 1.1) + 60).toFixed(2);
+            if (shopStatus === 'promotion') {
+                totalPrice = totalPrice * 0.8; // Apply 20% discount during promotion
+            }
+
             let suggestionMin = ((totalPrice * 0.8) + 60).toFixed(2);
-            let suggestionMax = ((totalPrice * 1.1) + 60).toFixed(2);
+            
 
             if (suggestionMin < 100) {
                 suggestionMin = 100;
@@ -237,7 +250,7 @@
                 suggestionMax = 100;
             }
 
-            document.getElementById('quote').innerText = `基础价: ¥${totalPrice}，（还需加广告费，一般加60）`;
+            document.getElementById('quote').innerText = `基础价: ¥${totalPrice.toFixed(2)}，（还需加广告费，一般加60）`;
 
             const urgencyText = urgency === '12hours' ? '12小时内' : 
                                 urgency === '1day' ? '一天内' : 
@@ -253,7 +266,7 @@
                                ziLiao === 'noTiGong' ? '无资料' : '提供部分资料';
             const tablesText = tables === 'no' ? '不用做数据表' : `由设计师做${tableCount}张数据表`;
 
-            const finalPrice = Math.max(100, (parseFloat(totalPrice) + 60).toFixed(2));
+            const finalPrice = Math.max(100, (totalPrice + 60).toFixed(2));
             const detailsText = `${pages}页，${urgencyText}交付，${designText}，${contentText}页面，${ziLiaoText}，${tablesText}，根据以上需求为您报价：¥${finalPrice}。`;
             document.getElementById('details').innerText = detailsText;
 
