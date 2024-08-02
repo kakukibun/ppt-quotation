@@ -10,7 +10,306 @@
             font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #f5f5f5;
+        }<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPT 报价计算</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
         }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        h3 {
+            text-align: center;
+            color: #007bff;
+        }
+        .suggestion {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+        }
+        .detail-text {
+            text-align: center;
+            color: #333;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .detail-text button {
+            width: auto;
+            margin-left: 10px;
+            background-color: #007bff;
+        }
+        .detail-text button:hover {
+            background-color: #0056b3;
+        }
+        .watermark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><text x="50%" y="50%" fill="rgba(255,255,255,0.5)" font-size="20" font-family="Arial" text-anchor="middle" dy=".3em">私密报价</text></svg>') repeat;
+            opacity: 0.5;
+        }
+        .hidden {
+            display: none;
+        }
+        .password-prompt {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;" onkeydown="return disableKey(event);">
+    <div id="password-container" class="password-prompt">
+        <div>
+            <label for="password">请输入密码:</label>
+            <input type="password" id="password" />
+            <button onclick="checkPassword()">确认</button>
+        </div>
+    </div>
+    <div id="content" class="container hidden">
+        <div class="watermark"></div>
+        <h2>PPT 报价计算</h2>
+        <div class="form-group">
+            <label for="shop-status">店铺当前状态:</label>
+            <select id="shop-status">
+                <option value="normal">正常期</option>
+                <option value="promotion">冲量期</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="pages">页数:</label>
+            <input type="number" id="pages" min="1">
+        </div>
+        <div class="form-group">
+            <label for="urgency">交付时间（12小时内为紧急，计算结果会自动加钱）:</label>
+            <select id="urgency">
+                <option value="12hours">12小时内</option>
+                <option value="1day">一天内</option>
+                <option value="2days">两天内</option>
+                <option value="3days">三天内</option>
+                <option value="3daysplus">三天以上</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="design">设计级别（客户提供模板建议选一般或简单设计）:</label>
+            <select id="design">
+                <option value="simple">简单设计</option>
+                <option value="general">一般设计</option>
+                <option value="standard">标准设计</option>
+                <option value="premium">精美设计</option>
+                <option value="highEnd">高端设计</option>
+                <option value="chief">首席设计</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="contentPage">页面:</label>
+            <select id="contentPage">
+                <option value="static">静态</option>
+                <option value="dynamic">动态</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="ziLiao">是否提供资料:</label>
+            <select id="ziLiao">
+                <option value="tiGong">是</option>
+                <option value="noTiGong">否</option>
+                <option value="yiBuFen">提供部分资料</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="tables">是否要制作数据表:</label>
+            <select id="tables" onchange="toggleTableInput()">
+                <option value="no">否</option>
+                <option value="yes">是</option>
+            </select>
+        </div>
+        <div class="form-group hidden" id="table-count-group">
+            <label for="table-count">数据表数量:</label>
+            <input type="number" id="table-count" min="0">
+        </div>
+        <button onclick="calculatePrice()">计算基础价</button>
+        <h3 id="quote">基础价（未加广告费）: ¥0.00</h3>
+        <div class="detail-text">
+            <span id="details"> </span>
+            <button onclick="copyDetails()">复制报价结果</button>
+        </div>
+        <div class="suggestion" id="suggestion">建议报价: ¥0.00 ~ ¥0.00</div>
+    </div>
+
+    <script>
+        function disableKey(e) {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+                e.preventDefault();
+                return false;
+            }
+        }
+
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            if (password === '666') {
+                document.getElementById('password-container').style.display = 'none';
+                document.getElementById('content').classList.remove('hidden');
+            } else {
+                alert('密码错误，请重试。');
+            }
+        }
+
+        function toggleTableInput() {
+            const tableSelect = document.getElementById('tables');
+            const tableCountGroup = document.getElementById('table-count-group');
+            if (tableSelect.value === 'yes') {
+                tableCountGroup.classList.remove('hidden');
+            } else {
+                tableCountGroup.classList.add('hidden');
+            }
+        }
+
+
+        function calculatePrice() {
+            const pages = document.getElementById('pages').value;
+            const urgency = document.getElementById('urgency').value;
+            const design = document.getElementById('design').value;
+            const content = document.getElementById('contentPage').value;
+            const ziLiao = document.getElementById('ziLiao').value;
+            const tables = document.getElementById('tables').value;
+            const tableCount = document.getElementById('table-count').value || 0;
+            const shopStatus = document.getElementById('shop-status').value;
+
+            let price = 0; // Initialize price
+
+            if (design === 'simple') {
+                price = content === 'static' ? pages * 5 : pages * 8;
+            } else if (design === 'general') {
+                price = content === 'static' ? pages * 8 : pages * 12;
+            } else if (design === 'standard') {
+                price = content === 'static' ? pages * 12 : pages * 15;
+            } else if (design === 'premium') {
+                price = content === 'static' ? pages * 25 : pages * 30;
+            } else if (design === 'highEnd') {
+                price = content === 'static' ? pages * 40 : pages * 45;
+            } else if (design === 'chief') {
+                price = content === 'static' ? pages * 150 : pages * 200;
+            }
+
+            if (urgency === '12hours') {
+                price += pages * 1; // Additional charge for urgency
+            }
+
+            switch (ziLiao) {
+                case 'tiGong':
+                    price += pages * 0; // No additional charge for providing all materials
+                    break;
+                case 'noTiGong':
+                    price += pages * 2; // Additional charge for not providing materials
+                    break;
+                case 'yiBuFen':
+                    price += pages * 1; // Additional charge for providing partial materials
+                    break;
+            }
+
+            if (tables === 'yes') {
+                price += tableCount * 5; // Additional charge for each table
+            }
+
+            let totalPrice = parseFloat(price.toFixed(2));
+	    let suggestionMax = ((totalPrice * 1.1) + 60).toFixed(2);
+            if (shopStatus === 'promotion') {
+                totalPrice = totalPrice * 0.8; // Apply 20% discount during promotion
+            }
+
+            let suggestionMin = ((totalPrice * 0.8) + 60).toFixed(2);
+            
+
+            if (suggestionMin < 100) {
+                suggestionMin = 100;
+            }
+            if (suggestionMax < 100) {
+                suggestionMax = 100;
+            }
+
+            document.getElementById('quote').innerText = `基础价: ¥${totalPrice.toFixed(2)}，（还需加广告费，一般加60）`;
+
+            const urgencyText = urgency === '12hours' ? '12小时内' : 
+                                urgency === '1day' ? '一天内' : 
+                                urgency === '2days' ? '两天内' : 
+                                urgency === '3days' ? '三天内' : '三天以上';
+            const designText = design === 'simple' ? '简单设计' :
+                               design === 'general' ? '一般设计' :
+                               design === 'standard' ? '标准设计' :
+                               design === 'premium' ? '精美设计' :
+                               design === 'highEnd' ? '高端设计' : '首席设计';
+            const contentText = content === 'static' ? '静态' : '动态';
+            const ziLiaoText = ziLiao === 'tiGong' ? '提供资料' : 
+                               ziLiao === 'noTiGong' ? '无资料' : '提供部分资料';
+            const tablesText = tables === 'no' ? '不用做数据表' : `由设计师做${tableCount}张数据表`;
+
+            const finalPrice = Math.max(100, (totalPrice + 60).toFixed(2));
+            const detailsText = `${pages}页，${urgencyText}交付，${designText}，${contentText}页面，${ziLiaoText}，${tablesText}，根据以上需求为您报价：¥${finalPrice}。`;
+            document.getElementById('details').innerText = detailsText;
+
+            document.getElementById('suggestion').innerText = `建议报价: ¥${suggestionMin} ~ ¥${suggestionMax}，尽量在此范围内`;
+        }
+
+        function copyDetails() {
+            const detailsText = document.getElementById('details').innerText;
+            navigator.clipboard.writeText(detailsText).then(() => {
+                alert('复制成功!');
+            }).catch(err => {
+                alert('复制失败，请重试');
+            });
+        }
+    </script>
+</body>
+</html>
         .container {
             max-width: 500px;
             margin: 0 auto;
