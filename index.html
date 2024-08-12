@@ -81,7 +81,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><text x="50%" y="50%" fill="rgba(255,255,255,0.5)" font-size="20" font-family="Arial" text-anchor="middle" dy=".3em">私密报价</text></svg>') repeat;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><text x="50%" y="50%" fill="rgba(255,255,255,0.5)" font-size="20" font-family="Arial" text-anchor="middle" dy=".3em">要灵活报价</text></svg>') repeat;
             opacity: 0.5;
         }
         .hidden {
@@ -109,8 +109,9 @@
         <div class="form-group">
             <label for="shop-status">店铺当前状态:</label>
             <select id="shop-status">
-                <option value="normal">正常期</option>
-                <option value="promotion">冲量期</option>
+              <option value="promotion">冲量期</option> 
+              <option value="normal">正常期</option>
+                
             </select>
         </div>
         <div class="form-group">
@@ -164,8 +165,8 @@
             <label for="table-count">数据表数量:</label>
             <input type="number" id="table-count" min="0">
         </div>
-        <button onclick="calculatePrice()">计算基础价</button>
-        <h3 id="quote">基础价（未加广告费）: ¥0.00</h3>
+        <button onclick="calculatePrice()">计算报价</button>
+        <h3 id="quote">计算结果可点击复制结果按钮发给客户</h3>
         <div class="detail-text">
             <span id="details"> </span>
             <button onclick="copyDetails()">复制报价结果</button>
@@ -264,7 +265,7 @@
                 suggestionMax = 100;
             }
 
-            document.getElementById('quote').innerText = `基础价: ¥${totalPrice.toFixed(2)}，（还需加广告费，一般加60）`;
+            /document.getElementById('quote').innerText = `基础价: ¥${(totalPrice).toFixed(2)}，（还需加广告费，一般加60）`;/
 
             const urgencyText = urgency === '12hours' ? '12小时内' : 
                                 urgency === '1day' ? '一天内' : 
